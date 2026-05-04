@@ -1,0 +1,97 @@
+{
+  "name": "terraria-wiki-sniffer",
+  "version": "1.0.0",
+  "description": "A cross-platform Electron app that scrapes terraria.wiki.gg and answers questions with local Ollama.",
+  "author": "Terraria Wiki Sniffer",
+  "private": true,
+  "type": "module",
+  "main": "src/main/main.js",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "vite build",
+    "dist": "npm run build && electron-builder",
+    "dist:linux": "npm run build && electron-builder --linux deb AppImage",
+    "dist:win": "npm run build && electron-builder --win nsis portable",
+    "init-db": "python scripts/init_db.py --db db/empty.sqlite",
+    "scrape": "python scripts/scraper.py --db db/wiki.sqlite"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.5.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "reactflow": "^11.11.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^41.5.0",
+    "electron-builder": "^26.0.12",
+    "vite": "^6.3.4",
+    "wait-on": "^8.0.3"
+  },
+  "build": {
+    "appId": "com.terrariawikisniffer.app",
+    "productName": "Terraria Wiki Sniffer",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/renderer/**/*",
+      "src/main/**/*",
+      "src/preload/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "scripts",
+        "to": "scripts",
+        "filter": [
+          "**/*.py"
+        ]
+      },
+      {
+        "from": "db/schema.sql",
+        "to": "db/schema.sql"
+      },
+      {
+        "from": "db/empty.sqlite",
+        "to": "db/empty.sqlite"
+      }
+    ],
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "category": "Utility",
+      "maintainer": "Terraria Wiki Sniffer",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "deb": {
+      "depends": [
+        "python3",
+        "python3-bs4",
+        "python3-requests"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}-Setup-${arch}.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable-${arch}.${ext}"
+    }
+  }
+}
