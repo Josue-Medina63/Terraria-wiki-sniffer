@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, for example 1.0.0"
+        required: true
+        default: "1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Windows release
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: python -m pip install -r requirements.txt
+      - run: npm run init-db
+      - run: npm run dist:win
+      - name: Publish Windows 1.0 release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}-windows', github.event.inputs.version) || format('{0}-windows', github.ref_name) }}
+          name: Terraria Wiki Sniffer ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }} for Windows
+          body: |
+            Windows 1.0 release for Terraria Wiki Sniffer.
+
+            Includes:
+            - NSIS installer
+            - Portable executable
+
+            Requirements:
+            - Ollama installed and running locally
+            - Python available on PATH for wiki updates
+          files: |
+            release/*Setup*x64.exe
+            release/*Portable*x64.exe
+
+  linux:
+    name: Linux GNOME release
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y python3-bs4 python3-requests
+      - run: npm ci
+      - run: python -m pip install -r requirements.txt
+      - run: npm run init-db
+      - run: npm run dist:linux
+      - name: Publish Linux GNOME 1.0 release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}-linux-gnome', github.event.inputs.version) || format('{0}-linux-gnome', github.ref_name) }}
+          name: Terraria Wiki Sniffer ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }} for Linux GNOME
+          body: |
+            Linux GNOME 1.0 release for Terraria Wiki Sniffer.
+
+            Includes:
+            - Debian package for Ubuntu 22.04+
+            - AppImage
+
+            Requirements:
+            - Ollama installed and running locally
+            - Python 3, BeautifulSoup, and Requests
+          files: |
+            release/*.deb
+            release/*.AppImage

@@ -124,6 +124,22 @@ This creates an NSIS installer and portable `.exe` in `release/`. Windows users 
 python -m pip install -r requirements.txt
 ```
 
+## GitHub Releases
+
+This repo includes a release workflow that publishes two separate 1.0 releases:
+
+- `v1.0.0-windows`: NSIS installer and portable `.exe`
+- `v1.0.0-linux-gnome`: Ubuntu 22.04+ `.deb` and AppImage
+
+After pushing the repo, create and push a version tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+You can also run the **Release** workflow manually from GitHub Actions with version `1.0.0`.
+
 ## Project Layout
 
 ```text
