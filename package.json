@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "description": "A cross-platform Electron app that scrapes terraria.wiki.gg and answers questions with local Ollama.",
   "author": "Terraria Wiki Sniffer",
+  "homepage": "https://github.com/Josue-Medina63/Terraria-wiki-sniffer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Josue-Medina63/Terraria-wiki-sniffer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Josue-Medina63/Terraria-wiki-sniffer/issues"
+  },
   "private": true,
   "type": "module",
   "main": "src/main/main.js",
@@ -12,8 +20,8 @@
     "dist": "npm run build && electron-builder",
     "dist:linux": "npm run build && electron-builder --linux deb AppImage",
     "dist:win": "npm run build && electron-builder --win nsis portable",
-    "init-db": "python scripts/init_db.py --db db/empty.sqlite",
-    "scrape": "python scripts/scraper.py --db db/wiki.sqlite"
+    "init-db": "node scripts/python-runner.mjs scripts/init_db.py --db db/empty.sqlite",
+    "scrape": "node scripts/python-runner.mjs scripts/scraper.py --db db/wiki.sqlite"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.5.0",
